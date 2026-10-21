@@ -246,3 +246,20 @@ body[data-page='workspace'] .network-inspector h2 { color:#171416; }
 .network-stat-grid>div,.network-stat-grid>button { background:#faf9f9; border-color:#eee9ea; }
 .network-stat-grid strong { color:#171416; }
 .network-stat-grid svg { color:#6d001a; }
+/* Give the white canvas enough graphite structure to read at a glance. */
+.network-context,.dock-telemetry,.composer-card,.network-legend,.studio-evidence-button { box-shadow:0 5px 22px #1f171a12; }
+.network-agent .agent-hit-area { fill:#fff!important; stroke:#bdb5b8!important; }
+.network-agent:hover .agent-hit-area,.network-agent:focus-visible .agent-hit-area { fill:#faf8f9!important; stroke:#6d001a!important; }
+.identity-tile { fill:#f4f2f3; stroke:#302b2d; stroke-width:1.35; }
+.identity-lines { stroke:#1b1819; stroke-width:2; }
+.identity-nexus .identity-tile { fill:#f8f5f6; stroke:#6d001a; stroke-width:2; }
+.orb-surface { fill:#ddd9db!important; }
+.orb-aura { fill:#bdb7ba!important; opacity:.4; }
+.orb-rim { stroke:#91898d; opacity:.8; }
+.capability-node circle,.skill-satellite .orb-surface { fill:#b3adb0!important; stroke:#777074; }
+.orbital-wire,.orbital-wire.lit { stroke:#aaa2a6!important; opacity:.9; }
+.runtime-orbit,.runtime-orbit.inner,.runtime-ring { stroke:#d0c9cc; }
+.network-branch rect { fill:#f8f7f7; stroke:#c9c1c4; }
+.network-branch.selected rect { fill:#f5f1f2; stroke:#6d001a; }
+.focus-orbit { fill:#f8f7f7; stroke:#dad4d6; }
+body[data-page='workspace'] .network-inspector { background:#faf9f9; }
