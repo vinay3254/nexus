@@ -4,11 +4,12 @@ from contextlib import asynccontextmanager
 import json
 from pathlib import Path
 from typing import Any
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
 from nexus.app_store import AppStore
+from nexus.app_store.catalog import Catalog, AgentDefinition, default_catalog_path
 from nexus.blackboard import Blackboard
 from nexus.llm import LlmClient, create_llm_client
 from nexus.agents import CodingAgent, ResearchAgent, DataAgent, OpsAgent, Agent
@@ -17,7 +18,14 @@ from nexus.trust import SandboxRunner, SelfHealer, ReceiptSigner
 
 
 class RunTaskRequest(BaseModel):
-    task: str
+    model_config = ConfigDict(str_strip_whitespace=True, extra="forbid")
+    task: str = Field(min_length=1, max_length=20000)
+    agent_id: str | None = None
+
+
+class AgentStatusRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+    enabled: bool
 
 
 class ConnectionManager:
@@ -34,7 +42,7 @@ class ConnectionManager:
     async def broadcast(self, message: dict[str, Any]):
         msg_str = json.dumps(message)
         dead = []
-        for conn in self.active_connections:
+        for conn in tuple(self.active_connections):
             try:
                 await conn.send_text(msg_str)
             except Exception:
@@ -48,6 +56,7 @@ def create_app(
     blackboard: Blackboard | None = None,
     llm: LlmClient | None = None,
     agents: dict[str, Agent] | None = None,
+    catalog_path: str | Path | None = None,
 ) -> FastAPI:
     manager = ConnectionManager()
 
@@ -70,6 +79,12 @@ def create_app(
     else:
         agent_dict = agents
 
+    catalog = Catalog(
+        Path(catalog_path) if catalog_path is not None else default_catalog_path(),
+        store, agent_dict, llm_client,
+    )
+    running: set[asyncio.Task] = set()
+
     @asynccontextmanager
     async def lifespan(app_inst: FastAPI):
         async def blackboard_listener():
@@ -90,8 +105,14 @@ def create_app(
                     pass
 
         task = asyncio.create_task(blackboard_listener())
-        yield
-        task.cancel()
+        try:
+            yield
+        finally:
+            executions = tuple(running)
+            task.cancel()
+            for execution in executions:
+                execution.cancel()
+            await asyncio.gather(task, *executions, return_exceptions=True)
 
     app = FastAPI(title="Nexus Hub Daemon", lifespan=lifespan)
 
@@ -111,6 +132,8 @@ def create_app(
     @app.get("/min", response_class=HTMLResponse)
     @app.get("/next", response_class=HTMLResponse)
     @app.get("/workspace", response_class=HTMLResponse)
+    @app.get("/store", response_class=HTMLResponse)
+    @app.get("/installed", response_class=HTMLResponse)
     @app.get("/agents", response_class=HTMLResponse)
     @app.get("/executions", response_class=HTMLResponse)
     @app.get("/blackboard", response_class=HTMLResponse)
@@ -129,6 +152,54 @@ def create_app(
     async def get_agents():
         return [manifest.model_dump() for manifest in store.list()]
 
+    @app.get("/api/store")
+    async def list_catalog():
+        return catalog.list()
+
+    def catalog_call(operation, *args):
+        try:
+            return operation(*args)
+        except KeyError as error:
+            raise HTTPException(404, str(error.args[0])) from error
+        except ValueError as error:
+            raise HTTPException(409, str(error)) from error
+
+    def require_idle():
+        if running:
+            raise HTTPException(409, "An execution is active. Wait before changing installed agents.")
+
+    @app.get("/api/store/{agent_id}")
+    async def get_listing(agent_id: str):
+        return catalog_call(catalog.get, agent_id)
+
+    @app.post("/api/store", status_code=201)
+    async def publish_agent(definition: AgentDefinition):
+        result = catalog_call(catalog.publish, definition)
+        await manager.broadcast({"type": "catalog_changed"})
+        return result
+
+    async def change_agent(agent_id: str, action: str):
+        require_idle()
+        result = catalog_call(catalog.change, agent_id, action)
+        await manager.broadcast({"type": "catalog_changed"})
+        return result
+
+    @app.post("/api/store/{agent_id}/install")
+    async def install_agent(agent_id: str):
+        return await change_agent(agent_id, "install")
+
+    @app.post("/api/store/{agent_id}/update")
+    async def update_agent(agent_id: str):
+        return await change_agent(agent_id, "update")
+
+    @app.patch("/api/store/{agent_id}")
+    async def set_agent_enabled(agent_id: str, req: AgentStatusRequest):
+        return await change_agent(agent_id, "enable" if req.enabled else "disable")
+
+    @app.delete("/api/store/{agent_id}/install")
+    async def uninstall_agent(agent_id: str):
+        return await change_agent(agent_id, "uninstall")
+
     @app.get("/api/blackboard")
     async def get_blackboard():
         entries = await bb.list_all()
@@ -143,11 +214,18 @@ def create_app(
             for e in entries
         ]
 
-    async def _execute_task_pipeline(task_text: str):
+    async def _execute_task_pipeline(task_text: str, agent_id: str | None = None):
         await manager.broadcast({"type": "log", "message": f"🚀 Decomposing task: '{task_text}'"})
         planner = TaskPlanner()
         subtasks = planner.decompose(task_text)
-        supervisor = RouterSupervisor(store)
+        if agent_id:
+            from nexus.router.planner import Subtask
+            subtasks = [Subtask(id="subtask-selected", description=task_text)]
+            selected_store = AppStore()
+            selected_store.register(agent_dict[agent_id].manifest())
+            supervisor = RouterSupervisor(selected_store)
+        else:
+            supervisor = RouterSupervisor(store)
         sandbox = SandboxRunner()
         healer = SelfHealer(sandbox=sandbox, llm=llm_client)
 
@@ -212,10 +290,28 @@ def create_app(
         })
         await manager.broadcast({"type": "log", "message": "✨ Task completed successfully."})
 
+    async def execute_safely(req: RunTaskRequest):
+        try:
+            await _execute_task_pipeline(req.task, req.agent_id)
+        except asyncio.CancelledError:
+            raise
+        except Exception as error:
+            await manager.broadcast({"type": "log", "message": f"Task failed: {error}"})
+
+    def schedule(req: RunTaskRequest):
+        require_idle()
+        if req.agent_id and (store.get(req.agent_id) is None or req.agent_id not in agent_dict):
+            raise HTTPException(409, "Selected agent is not installed and enabled.")
+        if not any(agent_id in agent_dict for agent_id in [a.id for a in store.list()]):
+            raise HTTPException(409, "Install and enable an agent before running a task.")
+        execution = asyncio.create_task(execute_safely(req))
+        running.add(execution)
+        execution.add_done_callback(running.discard)
+
     @app.post("/api/run")
     async def run_task(req: RunTaskRequest):
-        asyncio.create_task(_execute_task_pipeline(req.task))
-        return {"status": "dispatched", "task": req.task}
+        schedule(req)
+        return {"status": "dispatched", "task": req.task, "agent_id": req.agent_id}
 
     @app.websocket("/ws")
     async def websocket_endpoint(websocket: WebSocket):
@@ -228,9 +324,9 @@ def create_app(
                     if payload.get("action") == "run_task":
                         task = payload.get("task", "")
                         if task:
-                            asyncio.create_task(_execute_task_pipeline(task))
-                except Exception:
-                    pass
+                            schedule(RunTaskRequest(task=task, agent_id=payload.get("agent_id")))
+                except Exception as error:
+                    await websocket.send_json({"type": "log", "message": f"Task failed: {error}"})
         except WebSocketDisconnect:
             manager.disconnect(websocket)
 

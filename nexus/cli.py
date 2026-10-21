@@ -25,6 +25,7 @@ def init_system(
     mock_llm: bool = False,
     persist_db: str | None = None,
     plugins_dir: str | None = None,
+    use_catalog: bool = True,
 ):
     selected_provider = "mock" if mock_llm else provider
     llm = create_llm_client(preferred=selected_provider)
@@ -46,6 +47,10 @@ def init_system(
 
     for agent in agents.values():
         store.register(agent.manifest())
+
+    if use_catalog:
+        from nexus.app_store.catalog import Catalog, default_catalog_path
+        Catalog(default_catalog_path(), store, agents, llm)
 
     persistence_store = None
     if persist_db:
@@ -142,6 +147,7 @@ def serve_dashboard(
         mock_llm=mock_llm,
         persist_db=persist,
         plugins_dir=plugins,
+        use_catalog=False,  # create_app needs all server implementations, including uninstalled ones.
     )
 
     async def _start():

@@ -62,7 +62,7 @@ async def test_server_spa_serving():
             expected = "javascript" if asset.endswith(".js") else "text/css"
             assert expected in asset_resp.headers["content-type"]
 
-        for route in ["/dashboard", "/min", "/next", "/workspace", "/agents", "/executions",
+        for route in ["/store", "/installed", "/dashboard", "/min", "/next", "/workspace", "/agents", "/executions",
                       "/blackboard", "/execution-inspector", "/trust", "/runtime"]:
             page = await client.get(route)
             assert page.status_code == 200

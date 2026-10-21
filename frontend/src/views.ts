@@ -1,5 +1,7 @@
 import { $, esc, icon, pretty, dialog } from './dom';
 import { state, catalog } from './models';
+import { renderNetwork } from './network';
+import { renderStore, showStoreAgent } from './store';
 import { renderWorkflow } from './workflows';
 import type { AgentManifest, EventFilter, EventKind } from './types';
 export function displayPipeline(stage = 4, title?: string) {
@@ -29,17 +31,22 @@ export function renderAgents() {
         .join('');
   $('overview-agents').innerHTML =
     cards(state.agents.slice(0, 4)) || '<p class="empty">No agents registered.</p>';
-  $('registry-agents').innerHTML =
+  if (state.mode === 'preview') $('registry-agents').innerHTML =
     cards(
       state.agents.filter((a) =>
         `${a.name} ${a.id} ${a.capabilities.join(' ')}`.toLowerCase().includes(q),
       ),
     ) || '<p class="empty">No matching agents.</p>';
+  const selected = $('task-agent').value;
+  $('task-agent').innerHTML = '<option value="">Automatic routing · installed agents</option>' + state.agents.map((agent) => `<option value="${esc(agent.id)}">${esc(agent.name)}</option>`).join('');
+  $('task-agent').value = state.agents.some((agent) => agent.id === selected) ? selected : '';
+  renderStore();
   $('agent-total').textContent = state.agents.length + ' agents';
   $('specialist-count').textContent = state.agents.length + ' registered';
   renderWorkflow();
 }
 export function showAgent(id: string) {
+  if (state.mode === 'live') { showStoreAgent(id); return; }
   const a = state.agents.find((x) => x.id === id);
   if (!a) return;
   dialog(
@@ -48,6 +55,7 @@ export function showAgent(id: string) {
   );
 }
 export function renderBoard() {
+  renderNetwork();
   const q = $('board-search').value.toLowerCase();
   $('board-count').textContent = state.board.length + ' entries';
   $('overview-board').innerHTML =
@@ -128,6 +136,7 @@ export function renderSandbox() {
       .join('') || '<p class="empty">No sandbox events. Code tasks populate this inspector.</p>';
 }
 export function renderReceipts() {
+  renderNetwork();
   $('receipt-list').innerHTML =
     state.receipts
       .map(

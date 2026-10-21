@@ -1,10 +1,10 @@
 import { test, expect, type Page } from '@playwright/test';
 import { generateKeyPairSync, sign } from 'node:crypto';
 
-async function openWorkspace(page: Page, path = '/') {
+async function openWorkspace(page: Page, path = '/workspace') {
   await page.goto(path);
   await expect(page.locator('#connection-text')).toHaveText('Connected');
-  await expect(page.locator('#registry-agents .agent-card')).toHaveCount(4);
+  await expect(page.locator('#registry-agents .store-card')).toHaveCount(4);
 }
 async function navigate(page: Page, destination: string) {
   const menu = page.locator('#menu');
@@ -20,6 +20,13 @@ test('live startup, navigation, all agent graphs, keyboard controls, and respons
   page.on('pageerror', (error) => errors.push(error.message));
   await openWorkspace(page);
   await expect(page.locator('#run-label')).toHaveText('Run task');
+  await page.locator('[data-network-agent="research-agent"]').click();
+  await expect(page.locator('#network-inspector h2')).toHaveText('Research Specialist');
+  await page.locator('#network-zoom-in').click();
+  await page.locator('#network-reset').click();
+  await page.locator('[data-network-agent="coding-agent"]').focus();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('#network-inspector h2')).toHaveText('Coding Specialist');
   await expect(page.locator('#history details')).toHaveCount(0);
   for (const [agent, nodes] of [
     ['coding-agent', 8],
@@ -42,6 +49,7 @@ test('live startup, navigation, all agent graphs, keyboard controls, and respons
   for (const width of [320, 390, 768, 1440]) {
     await page.setViewportSize({ width, height: 950 });
     for (const destination of [
+      'store',
       'workspace',
       'agents',
       'executions',
@@ -56,6 +64,9 @@ test('live startup, navigation, all agent graphs, keyboard controls, and respons
     }
   }
   for (const [path, destination] of [
+    ['/dashboard', 'workspace'],
+    ['/store', 'store'],
+    ['/installed', 'agents'],
     ['/blackboard', 'blackboard'],
     ['/execution-inspector', 'executions'],
     ['/agents', 'agents'],

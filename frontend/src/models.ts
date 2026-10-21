@@ -53,7 +53,7 @@ export const state: AppState = {
   timer: null,
   filter: 'all',
   overviewFilter: 'all',
-  page: 'workspace',
+  page: 'store',
   max: 300,
   connected: false,
   base: '',

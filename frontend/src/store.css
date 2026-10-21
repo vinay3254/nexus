@@ -1,0 +1,74 @@
+/* Agent store: shares workspace colors, type, spacing, and controls. */
+.store-intro { display:grid; grid-template-columns:1.1fr 1fr; gap:56px; padding:34px 38px; border:1px solid #ced9c6; background:#e9eee1; border-radius:14px; margin:28px 0; }
+.store-emblem { display:flex; width:42px; height:42px; border:1px solid #bacab2; border-radius:12px; align-items:center; justify-content:center; color:var(--green); margin-bottom:16px; }
+.store-emblem svg { width:24px; height:24px; fill:none; stroke:currentColor; stroke-width:1.4; }
+.store-intro h2 { font:400 34px/1.14 var(--serif); letter-spacing:-.8px; margin:0 0 14px; }
+.store-intro-copy>p { color:#53634f; max-width:430px; line-height:1.7; font-size:13px; margin:0 0 18px; }
+.store-how { border-left:1px solid #cdd7c5; padding-left:34px; display:flex; flex-direction:column; justify-content:center; gap:24px; }
+.store-how>div { display:flex; gap:18px; align-items:baseline; }
+.store-how>div>span { font:11px var(--mono); color:#6b7c62; }
+.store-how p { margin:0; }
+.store-how strong { display:block; font-size:14px; font-weight:600; }
+.store-how small { display:block; margin-top:4px; color:#5b6b55; font-size:12px; }
+.store-toolbar { display:flex; gap:12px; align-items:center; }
+.store-search { position:relative; display:block; flex:1; }
+.store-search>svg { position:absolute; left:14px; top:13px; width:17px; height:17px; stroke:var(--muted); stroke-width:1.5; fill:none; }
+.store-search .input { padding-left:41px; width:100%; }
+.store-toolbar>select { width:auto; min-width:150px; max-width:210px; }
+.store-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+.store-card { padding:25px; display:flex; flex-direction:column; min-width:0; transition:border-color .15s, box-shadow .15s; }
+.store-card:hover { border-color:#acb9a5; box-shadow:0 4px 16px #2f544508; }
+.store-card-top { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:19px; }
+.store-icon { width:49px; height:49px; display:flex; justify-content:center; align-items:center; background:#e9ede4; color:#476244; border:1px solid #d6dfcd; border-radius:13px; font:18px var(--mono); flex-shrink:0; }
+.store-icon[data-category="Development"] { background:#e7ecef; color:#3d5e6b; border-color:#d4dfe4; }
+.store-icon[data-category="Research"] { background:#f1eadf; color:#816441; border-color:#e6dbc9; }
+.store-icon[data-category="Operations"] { background:#eae7ef; color:#6a587e; border-color:#dcd5e5; }
+.store-source,.store-publisher,.store-version { color:var(--muted); font-size:11px; }
+.store-source { text-align:right; }
+.store-card-heading { display:flex; justify-content:space-between; align-items:baseline; gap:10px; }
+.store-card h3 { margin:0; font-size:17px; letter-spacing:-.25px; }
+.store-card h3 button { border:0; background:none; font:inherit; text-align:left; padding:0; }
+.store-card h3 button:hover { color:var(--green); text-decoration:underline; text-underline-offset:3px; }
+.store-version { font:10px var(--mono); flex-shrink:0; }
+.store-publisher { margin:4px 0 11px; }
+.store-description { color:#636b61; font-size:12px; line-height:1.75; margin:0 0 18px; min-height:42px; overflow-wrap:anywhere; }
+.store-tags { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:22px; margin-top:auto; }
+.store-tags span { padding:3px 8px; border-radius:4px; background:#f2f2ec; color:#697060; font:10px var(--mono); overflow-wrap:anywhere; }
+.store-card-foot { display:flex; align-items:center; justify-content:space-between; gap:10px; border-top:1px solid var(--line); padding-top:16px; }
+.store-installed { color:var(--muted); font-size:11px; display:flex; gap:6px; align-items:center; }
+.store-installed.is-enabled { color:var(--green); }
+.button.compact { padding:7px 11px; font-size:11px; min-height:34px; }
+.store-publish-note { display:flex; justify-content:space-between; align-items:center; gap:24px; border-top:1px solid var(--line); margin-top:34px; padding-top:26px; }
+.store-publish-note h2 { font:400 23px var(--serif); margin:0 0 6px; }
+.store-publish-note p { color:var(--muted); font-size:12px; max-width:490px; margin:0; }
+.store-publish-note .button { flex-shrink:0; }
+.store-empty { padding:35px 22px; color:var(--muted); border:1px dashed var(--line); border-radius:12px; grid-column:1/-1; text-align:center; font-size:13px; }
+.store-status { padding:12px 15px; background:#f3ecdf; color:#70501e; border-radius:8px; font-size:12px; }
+.store-detail-meta { display:flex; flex-wrap:wrap; gap:10px; align-items:center; color:var(--muted); font-size:11px; margin-bottom:15px; }
+.store-detail-heading { font-size:13px; margin:20px 0 8px; }
+.store-permissions { padding-left:19px; color:#60685d; font-size:12px; line-height:1.8; }
+.store-sample { background:var(--wash); padding:13px 15px; border-radius:7px; font-size:12px; overflow-wrap:anywhere; }
+.store-detail-actions { display:flex; flex-wrap:wrap; gap:9px; margin-top:20px; align-items:center; }
+.store-detail-actions .text-link { padding:8px 0; }
+.store-detail-actions .danger { color:var(--red); }
+.store-instructions { margin-top:12px; font-size:12px; }
+.store-instructions summary { cursor:pointer; }
+.store-form { display:grid; gap:14px; margin-top:20px; }
+.store-form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.store-form label { display:grid; gap:6px; font-size:11px; color:#5b6455; }
+.store-form .input { width:100%; min-width:0; font-size:12px; }
+.store-form textarea { resize:vertical; }
+.task-agent-label { display:block; font-size:11px; color:var(--muted); margin-bottom:6px; }
+.task-agent { width:100%; margin-bottom:15px; font-size:12px; }
+@media(min-width:1600px) { .store-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+@media(max-width:1000px) { .store-intro { gap:28px; padding:28px; } .store-how { padding-left:24px; } .store-toolbar { flex-wrap:wrap; } .store-search { flex-basis:100%; } .store-toolbar>select { max-width:none; flex:1; } }
+@media(max-width:600px) {
+  .store-grid { grid-template-columns:minmax(0,1fr); }
+  .store-intro { grid-template-columns:1fr; gap:24px; padding:24px; margin:20px 0; }
+  .store-intro h2 { font-size:30px; }
+  .store-how { border-left:0; border-top:1px solid #cdd7c5; padding:22px 0 0; gap:17px; }
+  .store-card { padding:22px; }
+  .store-toolbar>select { min-width:0; width:0; font-size:11px; padding-right:20px; }
+  .store-publish-note { flex-direction:column; align-items:flex-start; }
+  .store-form-grid { grid-template-columns:1fr; }
+}

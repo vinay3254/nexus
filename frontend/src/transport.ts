@@ -25,12 +25,11 @@ import {
   type BoardEntry,
   type ServerMessage,
 } from './types';
+import { renderNetwork } from './network';
+import { loadStore, renderStore } from './store';
+import { request } from './net';
+export { request } from './net';
 import { parseAgents, parseBoard, parseServerMessage } from './validation';
-export async function request(path: string, options: RequestInit = {}): Promise<unknown> {
-  const r = await fetch(state.base + path, { ...options, signal: AbortSignal.timeout(10000) });
-  if (!r.ok) throw new Error(`Server returned HTTP ${r.status}.`);
-  return r.json();
-}
 export function normalizeAgents(agents: unknown): AgentManifest[] {
   return parseAgents(agents);
 }
@@ -84,6 +83,7 @@ export function updateMode() {
       : 'Disconnected'
     : 'Preview mode';
   $('run-label').textContent = live ? 'Run task' : 'Run preview';
+  renderNetwork();
 }
 export function stopConnection() {
   state.epoch++;
@@ -97,6 +97,7 @@ export function stopConnection() {
   state.connected = false;
 }
 export function handleMessage(data: ServerMessage) {
+  if (data.type === 'catalog_changed') { void loadStore(); void loadAgents(); return; }
   observeWorkflow(data);
   processMessage(data);
 }
@@ -104,6 +105,16 @@ export function processMessage(data: ServerMessage) {
   if (data.type === 'log') {
     const msg = String(data.message || '');
     addEvent(/error|failed|⚠/i.test(msg) ? 'error' : 'activity', msg);
+    if (/Task failed:/.test(msg)) {
+      const run = [...state.runs].reverse().find((item) => !item.preview && ['Dispatching', 'Dispatched', 'Running'].includes(item.status));
+      if (run) run.status = 'Failed';
+      $('execution-status').textContent = 'Failed';
+      $('execution-caption').textContent = msg;
+      feedback(msg, true);
+      state.activeAgent = null;
+      setBusy(false);
+      renderHistory();
+    }
     if (/Decomposing/.test(msg)) {
       displayPipeline(1);
       $('execution-status').textContent = 'Running';
@@ -165,6 +176,7 @@ export function openSocket() {
     $('connect-feedback').textContent = 'Connected. Receiving live events.';
     loadAgents();
     loadBoard();
+    loadStore();
   };
   socket.onmessage = (e) => {
     if (epoch !== state.epoch) return;
@@ -247,6 +259,7 @@ export function usePreview() {
   state.mode = 'preview';
   updateMode();
   seed();
+  renderStore();
   $('connect-feedback').textContent = 'Standalone preview active.';
   feedback('');
 }

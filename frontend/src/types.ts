@@ -1,4 +1,5 @@
 export const pages = [
+  'store',
   'workspace',
   'agents',
   'blackboard',
@@ -57,6 +58,7 @@ export interface SandboxEvent {
   healed_code?: string;
 }
 export type ServerMessage =
+  | { type: 'catalog_changed' }
   | { type: 'log'; message: string }
   | ({ type: 'blackboard_update' } & Omit<BoardEntry, 'timestamp'>)
   | ({ type: 'sandbox_event' } & SandboxEvent)

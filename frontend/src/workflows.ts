@@ -1,5 +1,6 @@
 import { $, esc, icon, pretty, dialog } from './dom';
 import { state } from './models';
+import { storeState } from './store';
 import { navigate } from './routing';
 import type {
   NodeKey,
@@ -59,6 +60,12 @@ export const workflowSpecs: Record<string, WorkflowSpec> = {
   },
 };
 export function workflowSpec(id: string): WorkflowSpec {
+  const listing = state.mode === 'live' ? storeState.agents.find((agent) => agent.id === id) : undefined;
+  if (listing?.source === 'local' && listing.installed_definition) {
+    return { prefix: 'AG', model: 'Generate response', field: 'result', code: false,
+      source: 'app_store/catalog.py · installed prompt definition',
+      system: listing.installed_definition.system_prompt, prompt: '' };
+  }
   return (
     workflowSpecs[id] || {
       prefix: 'AG',
@@ -382,12 +389,8 @@ export function observeWorkflow(data: ServerMessage) {
     if (routed) {
       workflowUpdate(routed[1], { route: 'routed' });
     }
-    const passed = msg.match(
-      /Sandbox execution and self-healing passed for \[subtask-(code|ops)\]/,
-    );
-    if (passed) {
-      const id = passed[1] === 'code' ? 'coding-agent' : 'ops-agent';
-      workflowUpdate(id, { sandbox: 'completed' });
+    if (/Sandbox execution and self-healing passed/.test(msg) && state.activeAgent) {
+      workflowUpdate(state.activeAgent, { sandbox: 'completed' });
     }
   }
   if (data.type === 'blackboard_update')

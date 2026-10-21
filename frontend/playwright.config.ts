@@ -1,5 +1,11 @@
 import { defineConfig, devices } from '@playwright/test';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+const storeDirectory = mkdtempSync(join(tmpdir(), 'nexus-store-test-'));
+process.on('exit', () => rmSync(storeDirectory, { recursive: true, force: true }));
 
 export default defineConfig({
   testDir: './tests',
@@ -24,6 +30,7 @@ export default defineConfig({
     },
   ],
   webServer: {
+    env: { NEXUS_STORE_PATH: join(storeDirectory, 'store.sqlite3') },
     command: 'uv run nexus serve --mock-llm --port 8769',
     cwd: fileURLToPath(new URL('..', import.meta.url)),
     url: 'http://127.0.0.1:8769/health',

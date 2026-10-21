@@ -1,4 +1,9 @@
 import './styles.css';
+import './store.css';
+import './control.css';
+import './studio.css';
+import { setupNetwork } from './network';
+import { setupStore, loadStore } from './store';
 import {
   $,
   esc,
@@ -59,6 +64,7 @@ async function dispatch(e: Event) {
   }
   if (state.busy) return;
   if (state.mode === 'preview') {
+    if ($('task-agent').value) { feedback('Preview uses automatic sample routing. Choose automatic routing or connect to run a specific agent.', true); return; }
     runPreview(task);
     return;
   }
@@ -66,7 +72,8 @@ async function dispatch(e: Event) {
     feedback('Server disconnected. Reconnect before dispatching.', true);
     return;
   }
-  beginWorkflow(task, plan(task), false);
+  const agentId = $('task-agent').value;
+  beginWorkflow(task, agentId ? [[agentId, task]] : plan(task), false);
   setBusy(true);
   feedback('Dispatching task…');
   const epoch = state.epoch;
@@ -85,7 +92,7 @@ async function dispatch(e: Event) {
     await request('/api/run', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ task }),
+      body: JSON.stringify({ task, ...(agentId ? { agent_id: agentId } : {}) }),
     });
     if (epoch !== state.epoch) return;
     if (run.status === 'Dispatching') {
@@ -134,16 +141,18 @@ function previewPlan() {
     $('task-input').focus();
     return;
   }
-  const p = plan(task);
+  const agentId = $('task-agent').value;
+  const p = agentId ? [[agentId, task]] : plan(task);
   dialog(
     'Execution plan',
     `<span class="label-tag neutral">LOCAL DRY RUN · NO EXECUTION</span><p style="margin-top:15px">${esc(task)}</p><ol style="padding-left:20px;font-size:12px;line-height:2.1">${p.map(([id, label]) => `<li>${esc(label)}<br><span class="secondary">${esc(id)} · capability-based match</span></li>`).join('')}</ol><p class="hint">Matches the built-in keyword planner. Live routing depends on the registered agent catalog. Only code outputs enter the sandbox.</p><div class="dialog-actions"><button class="button primary" id="plan-run">${state.mode === 'preview' ? 'Run preview' : 'Run task'} ${icon('arrow')}</button></div>`,
   );
 }
 const destinations: Array<[string, Page]> = [
-  ['Overview', 'workspace'],
+  ['Agent store', 'store'],
+  ['Dashboard', 'workspace'],
   ['Executions', 'executions'],
-  ['Agent registry', 'agents'],
+  ['Installed agents', 'agents'],
   ['Blackboard', 'blackboard'],
   ['Trust & receipts', 'trust'],
   ['Runtime & settings', 'runtime'],
@@ -208,6 +217,7 @@ document.addEventListener('click', (e) => {
         'data-agent': 'Analyze CSV data to ',
         'ops-agent': 'Configure Docker deployment for ',
       };
+    $('task-agent').value = state.mode === 'live' ? id : '';
     $('task-input').value = prompts[id] || 'Describe a task for ' + id + ': ';
     $('detail-dialog').close();
     navigate('workspace');
@@ -242,6 +252,7 @@ $('agent-search').oninput = renderAgents;
 $('board-search').oninput = renderBoard;
 $('refresh-agents').onclick = () => {
   loadAgents();
+  loadStore();
   if (state.mode === 'preview') toast('Showing sample registry. Connect a server for live agents.');
 };
 $('refresh-board').onclick = () => {
@@ -473,8 +484,13 @@ window.addEventListener('pagehide', stopConnection);
 window.addEventListener('pageshow', (e) => {
   if (e.persisted && state.mode === 'live') openSocket();
 });
+setupStore();
+setupNetwork();
 bootWorkspace();
 const routePage: Record<string, Page> = {
+  '/dashboard': 'workspace',
+  '/store': 'store',
+  '/installed': 'agents',
   '/workspace': 'workspace',
   '/agents': 'agents',
   '/executions': 'executions',
@@ -483,4 +499,4 @@ const routePage: Record<string, Page> = {
   '/trust': 'trust',
   '/runtime': 'runtime',
 };
-navigate(location.hash.slice(1) || routePage[location.pathname] || 'workspace');
+navigate(location.hash.slice(1) || routePage[location.pathname] || 'store');

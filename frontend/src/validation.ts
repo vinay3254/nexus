@@ -70,6 +70,7 @@ export function parseReceipt(value: unknown): Receipt {
 export function parseServerMessage(value: unknown): ServerMessage {
   if (!isRecord(value)) throw new Error('Invalid server event.');
   switch (value.type) {
+    case 'catalog_changed': return { type: 'catalog_changed' };
     case 'log':
       if (typeof value.message === 'string') return { type: 'log', message: value.message };
       break;

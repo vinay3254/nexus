@@ -3,11 +3,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta name="theme-color" content="#f5f4ef" />
-    <title>Nexus — Agent workspace</title>
+    <meta name="theme-color" content="#050b0c" />
+    <title>Nexus — Agent store</title>
     <link rel="icon" href="data:," />
-    <script type="module" crossorigin src="/assets/index-BLmOXU4J.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-BL8D3nrb.css">
+    <script type="module" crossorigin src="/assets/index-CTH0GwWa.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-nSMTLQnY.css">
   </head>
   <body>
     <svg hidden aria-hidden="true">
@@ -62,27 +62,30 @@
     <div class="mobile-shade" id="mobile-shade"></div>
     <div class="shell">
       <aside class="sidebar" id="sidebar" aria-label="Main navigation">
-        <a class="brand" href="#workspace"
+        <a class="brand" href="#store"
           ><svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
             <path d="M5 26V6l22 20V6M5 16h22" /></svg
           >nexus<span style="font-size: 17px; color: #83916d">.</span></a
         >
-        <div class="edition">AGENT ORCHESTRATION</div>
+        <div class="edition">YOUR AGENT LIBRARY</div>
         <button class="workspace-switch" id="workspace-switch">
           <span class="initial">N</span>Local workspace<svg><use href="#i-chevron" /></svg>
         </button>
-        <p class="nav-label">WORKSPACE</p>
+        <p class="nav-label">EXPLORE & BUILD</p>
         <nav class="navigation">
-          <button class="nav-link" data-page="workspace" aria-current="page">
-            <svg><use href="#i-grid" /></svg>Overview
+          <button class="nav-link" data-page="store" aria-current="page">
+            <svg><use href="#i-grid" /></svg>Agent store
+          </button>
+          <button class="nav-link" data-page="agents">
+            <svg><use href="#i-agents" /></svg>Installed agents<span class="nav-count" id="installed-count">0</span>
+          </button>
+          <button class="nav-link" data-page="workspace">
+            <svg><use href="#i-terminal" /></svg>Dashboard
           </button>
           <button class="nav-link" data-page="executions">
             <svg><use href="#i-flow" /></svg>Executions<span class="nav-count" id="run-count"
               >0</span
             >
-          </button>
-          <button class="nav-link" data-page="agents">
-            <svg><use href="#i-agents" /></svg>Agent registry
           </button>
           <button class="nav-link" data-page="blackboard">
             <svg><use href="#i-file" /></svg>Blackboard
@@ -117,10 +120,11 @@
               aria-expanded="false"
             >
               <svg><use href="#i-menu" /></svg></button
-            ><span>Local workspace</span><span>/</span
-            ><strong id="breadcrumb-title">Overview</strong>
+            ><a class="studio-brand" href="#store"><svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M5 26V6l22 20V6M5 16h22"/></svg><span>nexus<small>Agent platform</small></span></a><span>Local workspace</span><span>/</span
+            ><strong id="breadcrumb-title">Agent store</strong>
           </div>
           <div class="top-actions">
+            <button class="button ghost studio-new-task" id="new-task"><svg><use href="#i-plus" /></svg>New task</button>
             <button class="search-button" id="command-open">
               <svg><use href="#i-search" /></svg>Jump to… <kbd>Ctrl K</kbd></button
             ><button
@@ -134,80 +138,51 @@
           </div>
         </header>
         <main class="content" id="main" tabindex="-1">
-          <section id="page-workspace">
+          <section id="page-store">
             <div class="page-heading">
-              <div>
-                <p class="eyebrow">YOUR AGENT WORKSPACE</p>
-                <h1>Agent workspace</h1>
-                <p class="page-description">
-                  Give your agents a task. Keep the whole process in view.
-                </p>
-              </div>
-              <button class="button ghost" id="new-task">
-                <svg><use href="#i-plus" /></svg>New task
-              </button>
+              <div><h1>Discover your next agent.</h1><p class="page-description">Explore specialists. Review capabilities. Build your agent network.</p></div>
+              <button class="button" id="store-publish"><svg><use href="#i-plus" /></svg>Publish an agent</button>
             </div>
-            <div class="status-strip">
-              <span
-                ><span class="dot"></span
-                ><strong id="agent-total">0 agents</strong> registered</span
-              ><span class="sep"></span><span>Routing <strong>Capability-based</strong></span
-              ><span class="sep"></span><span id="mode-label">Live server · session events</span>
+            <div class="store-intro">
+              <div class="store-intro-copy"><span class="store-emblem"><svg><use href="#i-agents" /></svg></span><h2>Specialized agents.<br>One connected workspace.</h2><p>Start with Nexus specialists, or publish an agent with instructions of your own. Every installed agent joins the same workspace.</p><button class="text-link" data-page="agents">Open your library <svg><use href="#i-arrow" /></svg></button></div>
+              <div class="store-how"><div><span>01</span><p><strong>Find a specialist</strong><small>Explore capabilities and review permissions.</small></p></div><div><span>02</span><p><strong>Add it to your library</strong><small>Install once. Keep control of updates.</small></p></div><div><span>03</span><p><strong>Give it real work</strong><small>Run a task and follow the workflow.</small></p></div></div>
             </div>
-            <div class="dashboard-grid">
-              <section class="card card-pad composer-card">
-                <div class="card-head">
-                  <span class="label-tag neutral">01 / DISPATCH</span
-                  ><span class="auto-label"
-                    ><svg><use href="#i-flow" /></svg>Automatic orchestration</span
-                  >
+            <div class="store-toolbar">
+              <label class="store-search"><svg><use href="#i-search" /></svg><input class="input" id="store-search" type="search" placeholder="Search agents, skills, or publishers" aria-label="Search agent store"></label>
+              <select class="input" id="store-category" aria-label="Filter by category"><option value="">All categories</option><option>Development</option><option>Research</option><option>Data</option><option>Operations</option><option>Writing</option><option>Productivity</option></select>
+              <select class="input" id="store-sort" aria-label="Sort agents"><option value="featured">Catalog order</option><option value="name">Name A–Z</option><option value="available">Not installed first</option></select>
+            </div>
+            <div class="section-heading"><h2>Explore agents <span class="count" id="store-summary">Loading catalog…</span></h2><button class="text-link" id="store-refresh">Refresh</button></div>
+            <p class="store-status" id="store-status" role="status" hidden></p>
+            <div class="store-grid" id="store-grid" aria-label="Agent catalog"></div>
+            <div class="store-publish-note"><div><h2>Built something useful?</h2><p>Publish a prompt agent to this server’s catalog. Share its JSON definition with another Nexus workspace.</p></div><button class="button" id="store-import"><svg><use href="#i-download" /></svg>Import agent JSON</button><input type="file" id="store-file" accept=".json,application/json" hidden></div>
+          </section>
+          <section id="page-workspace" hidden>
+            <div class="studio-heading"><h1>Agent dashboard</h1><div class="status-strip"><span><strong id="agent-total">0 agents</strong> registered</span><span id="mode-label">Live server · session events</span></div></div>
+            <div class="nexus-observatory">
+              <section class="network-panel" aria-labelledby="network-title">
+                <div class="network-toolbar" role="toolbar" aria-label="Network controls">
+                  <div class="network-view-switch"><button class="studio-tool" id="network-overview" aria-label="Show orbital network" aria-pressed="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="5" cy="5" r="1.5"/><circle cx="20" cy="7" r="1.5"/><circle cx="18" cy="20" r="1.5"/><circle cx="4" cy="18" r="1.5"/><path d="m6 6 4 4m4-1 4-1m-4 6 3 4m-7-4-4 3"/></svg></button><button class="studio-tool" id="network-focus" aria-label="Inspect selected agent" aria-pressed="false"><svg><use href="#i-flow"/></svg></button></div>
+                  <div class="network-controls"><button class="studio-tool" id="network-zoom-in" aria-label="Zoom in on agent network"><svg><use href="#i-plus" /></svg></button><button class="studio-tool" id="network-zoom-out" aria-label="Zoom out of agent network"><svg viewBox="0 0 24 24"><path d="M5 12h14" /></svg></button></div>
+                  <button class="studio-tool" id="network-labels" aria-label="Show capability labels" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4zM8 9h8m-8 3h5"/></svg></button>
+                  <button class="studio-tool" id="network-reset" aria-label="Reset network view"><svg viewBox="0 0 24 24"><path d="M4 9V4h5m11 11v5h-5M4 4l6 6m10 10-6-6"/></svg></button>
                 </div>
-                <h2 class="composer-title">What are we working on?</h2>
-                <p class="secondary">Describe the outcome. Nexus finds the right specialists.</p>
+                <div class="network-context"><h2 id="network-title">Agent network</h2><p id="network-caption">Live capability map</p></div>
+                <div class="network-viewport" id="network-viewport" tabindex="0" aria-label="Scrollable agent network"><svg id="network-graph" viewBox="0 0 1600 900" role="group" aria-label="Interactive agent capability network"></svg></div>
+                <p class="network-mobile-hint">Drag to explore · tap an agent to inspect</p><div class="network-legend"><span><i class="network-dot gold"></i>Runtime</span><span><i class="network-dot"></i>Installed agent</span><span><i class="network-dot dim"></i>Capability / service</span><span id="network-total">0 connected agents</span></div>
+              </section>
+              <aside class="observatory-inspector" aria-label="Selected agent"><div id="network-inspector" class="network-inspector" hidden></div></aside>
+              <section class="card card-pad composer-card" aria-label="Task dock">
+                <div class="dock-telemetry" id="dock-telemetry" aria-label="Current session"></div>
+                <h2 class="composer-title">Run a task</h2>
                 <form id="task-form">
-                  <textarea
-                    class="task-field"
-                    id="task-input"
-                    aria-label="Task description"
-                    placeholder="Clean CSV data, write a Python script, and summarize the findings…"
-                    maxlength="20000"
-                    required
-                  ></textarea>
-                  <div class="example-prompts">
-                    <button
-                      type="button"
-                      class="prompt-chip"
-                      data-prompt="Clean CSV data and write a summary report"
-                    >
-                      Clean & analyze data</button
-                    ><button
-                      type="button"
-                      class="prompt-chip"
-                      data-prompt="Research multi-agent orchestration and summarize the findings"
-                    >
-                      Research a topic</button
-                    ><button
-                      type="button"
-                      class="prompt-chip"
-                      data-prompt="Write a Python script and configure Docker deployment"
-                    >
-                      Build & deploy
-                    </button>
-                  </div>
-                  <div class="compose-bottom">
-                    <div class="compose-bottom-left">
-                      <button type="button" class="text-link" id="preview-plan">
-                        <svg><use href="#i-flow" /></svg>Preview plan</button
-                      ><span class="auto-label">· No execution</span>
-                    </div>
-                    <button type="submit" class="button primary run-button" id="run-task">
-                      <svg><use href="#i-arrow" /></svg><span id="run-label">Run task</span
-                      ><kbd>⌘ ↵</kbd>
-                    </button>
-                  </div>
+                  <div class="dock-input"><textarea class="task-field" id="task-input" aria-label="Task description" placeholder="Give your agents a task…" maxlength="20000" rows="1" required></textarea><button type="submit" class="button primary run-button" id="run-task" aria-label="Run task"><svg><use href="#i-arrow" /></svg><span id="run-label" class="dock-run-label">Run task</span></button></div>
+                  <div class="compose-bottom"><div class="compose-bottom-left"><svg><use href="#i-agents"/></svg><label class="dock-run-label" for="task-agent">Run with</label><select class="input task-agent" id="task-agent" aria-label="Run task with agent"><option value="">Automatic routing</option></select></div><button type="button" class="text-link" id="preview-plan"><svg><use href="#i-flow" /></svg>Preview plan</button></div>
                   <p class="feedback" id="task-feedback" role="status" hidden></p>
                 </form>
               </section>
+              <button class="studio-evidence-button text-link" id="studio-evidence"><svg><use href="#i-flow"/></svg>Execution details <svg><use href="#i-chevron"/></svg></button>
+            </div>
               <section class="card card-pad execution-card" aria-labelledby="execution-heading">
                 <div class="card-head">
                   <h2 class="card-title" id="execution-heading">Latest execution</h2>
@@ -222,7 +197,6 @@
                   </button>
                 </div>
               </section>
-            </div>
             <section
               class="card workflow-card"
               id="agent-workflow"
@@ -274,7 +248,7 @@
             <div class="section-heading">
               <h2>Your specialists<span class="count" id="specialist-count">0 registered</span></h2>
               <button class="text-link" data-page="agents">
-                View registry <svg><use href="#i-arrow" /></svg>
+                Open library <svg><use href="#i-arrow" /></svg>
               </button>
             </div>
             <div class="agents-grid" id="overview-agents"></div>
@@ -374,10 +348,9 @@
           <section class="section-page" id="page-agents" hidden>
             <div class="page-heading">
               <div>
-                <p class="eyebrow">CAPABILITY APP STORE</p>
-                <h1>Agent registry</h1>
+                <h1>Installed agents</h1>
                 <p class="page-description">
-                  Specialists discovered by capability, ready for the router.
+                  Your library. Manage versions, availability, and the agents that do your work.
                 </p>
               </div>
               <button class="button" id="plugin-guide">
@@ -391,9 +364,10 @@
                 id="agent-search"
                 placeholder="Search agents or capabilities…"
                 aria-label="Search agents"
-              /><button class="button" id="refresh-agents">Refresh registry</button>
+              /><button class="button" id="refresh-agents">Refresh library</button>
             </div>
-            <div class="agents-grid" id="registry-agents"></div>
+            <div class="toolbar"><select class="input" id="installed-filter" aria-label="Filter installed agents"><option value="all">All installed</option><option value="enabled">Enabled</option><option value="disabled">Disabled</option><option value="updates">Updates available</option></select><button class="text-link" data-page="store">Browse agent store <svg><use href="#i-arrow" /></svg></button></div>
+            <div class="store-grid" id="registry-agents"></div>
             <div class="card card-pad" style="margin-top: 22px">
               <h2 class="note-title">The right worker, automatically.</h2>
               <p class="secondary">
@@ -586,7 +560,7 @@
             </div>
           </section>
           <footer class="footer">
-            <span>NEXUS / AGENT ORCHESTRATION HUB</span
+            <span>NEXUS / YOUR AGENT LIBRARY HUB</span
             ><span>Shared context. Accountable execution.</span
             ><span id="footer-mode">LIVE SERVER</span>
           </footer>

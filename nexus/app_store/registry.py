@@ -12,6 +12,9 @@ class AppStore:
     def register(self, manifest: AgentManifest) -> None:
         self._workers[manifest.id] = manifest
 
+    def unregister(self, agent_id: str) -> None:
+        self._workers.pop(agent_id, None)
+
     def list(self) -> list[AgentManifest]:
         return list(self._workers.values())
 

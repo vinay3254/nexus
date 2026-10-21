@@ -2,9 +2,10 @@ import { $ } from './dom';
 import { state } from './models';
 import { isPage, type Page } from './types';
 export function navigate(page: string) {
-  if (!isPage(page)) page = 'workspace';
-  const destination = isPage(page) ? page : 'workspace';
+  if (!isPage(page)) page = 'store';
+  const destination = isPage(page) ? page : 'store';
   state.page = destination;
+  document.body.dataset.page = destination;
   document
     .querySelectorAll<HTMLElement>('[id^="page-"]')
     .forEach((el) => (el.hidden = el.id !== 'page-' + page));
@@ -13,8 +14,9 @@ export function navigate(page: string) {
     else el.removeAttribute('aria-current');
   });
   $('breadcrumb-title').textContent = {
-    workspace: 'Overview',
-    agents: 'Agent registry',
+    store: 'Agent store',
+    workspace: 'Dashboard',
+    agents: 'Installed agents',
     blackboard: 'Blackboard',
     executions: 'Executions',
     trust: 'Trust & receipts',
