@@ -2,6 +2,7 @@ import './styles.css';
 import './store.css';
 import './control.css';
 import './studio.css';
+import './palette.css';
 import { setupNetwork } from './network';
 import { setupStore, loadStore } from './store';
 import {
