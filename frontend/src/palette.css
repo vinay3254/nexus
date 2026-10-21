@@ -219,3 +219,30 @@ body[data-page='workspace'] .run-button { color:#fff; background:#6d001a; border
 body[data-page='workspace'] #preview-plan { color:#6d001a; background:#faf4f6; }
 body[data-page='workspace'] .compose-bottom-left { color:#716a6d; }
 .network-inspector { background:#fff; }
+.identity-tile { fill:#fff; stroke:#d8cdd1; stroke-width:1; }
+.identity-lines { fill:none; stroke:#292326; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+.identity-lines circle { fill:#fff; }
+.identity-lines .identity-accent { stroke:#6d001a; }
+.identity-nexus .identity-tile { fill:#fff; stroke:#6d001a; stroke-width:1.4; }
+.identity-nexus .identity-lines { stroke:#6d001a; stroke-width:1.8; }
+.network-agent:hover .identity-tile,.network-agent:focus-visible .identity-tile { stroke:#6d001a; }
+.focused-agent .identity-tile { stroke:#6d001a; }
+.focus-orbit { fill:#faf8f9; stroke:#eee8ea; opacity:1; }
+.network-branch rect { fill:#fff; stroke:#dfd6d9; filter:none; }
+.network-branch.selected rect { fill:#fcf8f9; stroke:#6d001a; filter:none; }
+.branch-marker,.network-branch.selected .branch-marker { stroke:#6d001a; }
+#network-graph .branch-count,#network-graph .branch-name,#network-graph .fan-leaf-title,#network-graph .scene-empty { fill:#292326!important; }
+#network-graph .fan-leaf-meta { fill:#716a6d!important; }
+.leaf-state { fill:#faf4f6; stroke:#eadce0; }
+#network-graph .leaf-state-text { fill:#6d001a!important; }
+body[data-page='workspace'] .network-inspector { background:#fff; border-color:#e9e5e6; box-shadow:0 12px 40px #23191c0e; }
+body[data-page='workspace'] .network-inspector h2 { color:#171416; }
+.inspector-category,.inspector-category .icon-button,.inspector-description,.network-inspector>p,.inspector-status p,.inspector-evidence p,.network-stat-grid span { color:#716a6d; }
+.inspector-status { border-color:#eee9ea; }
+.inspector-status .label-tag { color:#6d001a; background:#faf4f6; border-color:#eadce0; }
+.inspector-status .button { color:#6d001a; background:#faf4f6; }
+.inspector-evidence { background:#faf9f9; }
+.inspector-evidence>div,.inspector-evidence .text-link,.inspector-footer .text-link { color:#4d4246; }
+.network-stat-grid>div,.network-stat-grid>button { background:#faf9f9; border-color:#eee9ea; }
+.network-stat-grid strong { color:#171416; }
+.network-stat-grid svg { color:#6d001a; }

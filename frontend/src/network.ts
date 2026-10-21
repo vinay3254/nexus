@@ -13,7 +13,6 @@ const network = { selected: 'coding-agent', view: 'overview' as View, branch: 's
 let previousView = '';
 let previousAgent = '';
 let previousCount = 0;
-const tone = ['violet', 'rose', 'cyan', 'violet'];
 const bezier = (x1: number, y1: number, x2: number, y2: number) =>
   `M${x1},${y1} C${x1 + (x2 - x1) * .55},${y1} ${x2 - (x2 - x1) * .42},${y2} ${x2},${y2}`;
 const cut = (text: string, length = 28) => text.length > length ? text.slice(0, length - 1) + '…' : text;
@@ -33,6 +32,23 @@ function orb(x: number, y: number, radius: number, color = 'gold', core = false)
     <circle class="orb-surface" cx="${x}" cy="${y}" r="${radius}" fill="url(#sphere-${color})"/>
     <ellipse class="orb-highlight" cx="${x - radius * .32}" cy="${y - radius * .43}" rx="${radius * .3}" ry="${radius * .13}" fill="#fff" transform="rotate(-35 ${x - radius * .32} ${y - radius * .43})"/>
   </g>`;
+}
+// Shared vector geometry keeps agent identity consistent in overview and inspection.
+function identity(x: number, y: number, size: number, key: string): string {
+  const glyphs: Record<string, string> = {
+    coding: '<path d="m18 16-8 8 8 8m12-16 8 8-8 8m-4-19-4 22"/>',
+    research: '<path d="M14 8h17l5 5v12M14 8v31h13M30 8v7h6M19 19h9M19 24h5"/><circle cx="30" cy="30" r="8"/><path class="identity-accent" d="m36 36 6 6"/>',
+    ops: '<path d="m24 7 4 5 6-1 3 6 5 3-2 6 1 6-6 3-3 6-6-1-6 2-3-5-6-3 1-6-5-4 3-6 6-1 3-5Z"/><circle cx="24" cy="24" r="7"/><path class="identity-accent" d="m21 24 2 2 4-5"/>',
+    data: '<path d="M9 11v28h31M16 31V21h5v10m6 0V15h5v16"/><path class="identity-accent" d="m14 17 9-5 7 1 8-6"/>',
+    router: '<path d="M24 10v13M12 34V23h24v11"/><circle cx="24" cy="9" r="4"/><circle cx="12" cy="37" r="4"/><circle cx="36" cy="37" r="4"/>',
+    blackboard: '<path d="M8 9h32v27H8zM17 40h14M24 36v4"/><path class="identity-accent" d="M14 16h9m-9 6h20m-20 6h14"/>',
+    trust: '<path d="m24 6 15 6v12c0 9-15 18-15 18S9 33 9 24V12Z"/><path class="identity-accent" d="m17 24 5 5 10-11"/>',
+    runtime: '<path d="M7 24h8l5-12 8 25 5-13h8"/>',
+    nexus: '<path d="m24 4 17 10v20L24 44 7 34V14Z"/><path d="M15 32V16l18 16V16M15 24h18"/>',
+    custom: '<path d="m24 7 16 9v17l-16 9-16-9V16Z"/><path class="identity-accent" d="m8 16 16 9 16-9M24 25v17"/>',
+  };
+  const kind = Object.keys(glyphs).find((name) => key.toLowerCase().includes(name)) ?? 'custom';
+  return `<g class="agent-identity identity-${kind}" aria-hidden="true" transform="translate(${x - size / 2} ${y - size / 2}) scale(${size / 48})"><path class="identity-tile" d="M10 1h28a9 9 0 0 1 9 9v28a9 9 0 0 1-9 9H10a9 9 0 0 1-9-9V10a9 9 0 0 1 9-9Z"/><g class="identity-lines">${glyphs[kind]}</g></g>`;
 }
 function definitions(): string {
   const colors: Record<string, [string, string, string]> = {
@@ -74,7 +90,7 @@ function overview(agents: AgentManifest[]): string {
     const busy = state.busy && state.activeAgent === agent.id;
     nodes.push(`<g class="network-agent orbital-agent ${busy ? 'working' : ''}" role="button" tabindex="0" aria-label="Select ${esc(agent.name)} in network" aria-pressed="false" data-network-agent="${esc(agent.id)}">
       <rect class="agent-hit-area" x="${x - 26}" y="${y - 29}" width="245" height="62" rx="6"/>
-      ${orb(x, y, 15, tone[index % tone.length])}<text class="orbital-agent-name" x="${x + 27}" y="${y - 1}">${esc(cut(agent.name, 27))}</text>
+      ${identity(x, y, 32, agent.id)}<text class="orbital-agent-name" x="${x + 27}" y="${y - 1}">${esc(cut(agent.name, 27))}</text>
       <text class="orbital-agent-meta" x="${x + 27}" y="${y + 17}">${agent.capabilities.length} skills <tspan>· ${outputs} outputs</tspan></text>
       ${busy ? `<circle class="working-ring" cx="${x}" cy="${y}" r="23"/>` : ''}
     </g>`);
@@ -96,10 +112,10 @@ function overview(agents: AgentManifest[]): string {
       branches.push(stream(`M${x},${y} L${tx},${ty}`, index * 4 + tagIndex + 20));
       nodes.push(`<g class="skill-satellite" aria-hidden="true">${orb(tx, ty, 4, 'cyan')}<text class="satellite-name" x="${tx + 9}" y="${ty + 4}">${esc(tag)}</text></g>`);
     });
-    nodes.push(`<g class="runtime-service network-agent" role="button" tabindex="0" aria-label="Open ${name}" data-network-service="${id}"><rect class="agent-hit-area" x="${x - 24}" y="${y - 26}" width="225" height="56" rx="6"/>${orb(x, y, 12, 'violet')}<text class="orbital-agent-name service-name" x="${x + 22}" y="${y - 2}">${name}</text><text class="orbital-agent-meta" x="${x + 22}" y="${y + 15}">${esc(meta)}</text></g>`);
+    nodes.push(`<g class="runtime-service network-agent" role="button" tabindex="0" aria-label="Open ${name}" data-network-service="${id}"><rect class="agent-hit-area" x="${x - 24}" y="${y - 26}" width="225" height="56" rx="6"/>${identity(x, y, 29, id)}<text class="orbital-agent-name service-name" x="${x + 22}" y="${y - 2}">${name}</text><text class="orbital-agent-meta" x="${x + 22}" y="${y + 15}">${esc(meta)}</text></g>`);
   });
   return `<g class="orbital-overview">${branches.join('')}${nodes.join('')}
-    <g class="nexus-nucleus">${orb(center.x, center.y, 29, 'gold', true)}<text class="nucleus-name" x="${center.x + 48}" y="${center.y - 4}">Nexus runtime</text><text class="nucleus-meta" x="${center.x + 48}" y="${center.y + 15}">${agents.length} installed ${agents.length === 1 ? 'agent' : 'agents'}</text></g>
+    <g class="nexus-nucleus">${identity(center.x, center.y, 64, 'nexus')}<text class="nucleus-name" x="${center.x + 48}" y="${center.y - 4}">Nexus runtime</text><text class="nucleus-meta" x="${center.x + 48}" y="${center.y + 15}">${agents.length} installed ${agents.length === 1 ? 'agent' : 'agents'}</text></g>
     ${agents.length ? '' : '<text class="scene-empty" x="800" y="570" text-anchor="middle">Install an agent from the store to begin.</text>'}
   </g>`;
 }
@@ -125,7 +141,7 @@ function focusGraph(agent: AgentManifest): string {
   }).join('');
   return `<g class="focused-network"><circle class="focus-orbit" cx="${x}" cy="${y}" r="186"/>
     ${paths}${leafPaths}
-    <g class="focused-agent network-agent" role="button" tabindex="0" aria-label="Select ${esc(agent.name)} in network" aria-pressed="true" data-network-agent="${esc(agent.id)}">${orb(x, y, 34, 'violet', true)}<text class="focused-agent-title" x="${x}" y="${y - 115}" text-anchor="middle">${esc(cut(agent.name, 25))}</text><text class="focused-agent-version" x="${x}" y="${y - 89}" text-anchor="middle">v${esc(agent.version)}</text><text class="focused-agent-state" x="${x}" y="${y + 110}" text-anchor="middle">${state.activeAgent === agent.id ? 'WORKING' : 'INSTALLED'}</text></g>
+    <g class="focused-agent network-agent" role="button" tabindex="0" aria-label="Select ${esc(agent.name)} in network" aria-pressed="true" data-network-agent="${esc(agent.id)}">${identity(x, y, 76, agent.id)}<text class="focused-agent-title" x="${x}" y="${y - 115}" text-anchor="middle">${esc(cut(agent.name, 25))}</text><text class="focused-agent-version" x="${x}" y="${y - 89}" text-anchor="middle">v${esc(agent.version)}</text><text class="focused-agent-state" x="${x}" y="${y + 110}" text-anchor="middle">${state.activeAgent === agent.id ? 'WORKING' : 'INSTALLED'}</text></g>
     ${branches.map(([branch, count, label], index) => `<g class="network-branch ${branch === network.branch ? 'selected' : ''}" role="button" tabindex="0" aria-pressed="${branch === network.branch}" aria-label="Show ${esc(label.toLowerCase())}" data-network-branch="${branch}"><rect x="405" y="${260 + index * 100}" width="185" height="64" rx="8"/><path class="branch-marker" d="M408 ${272 + index * 100}v38"/><text class="branch-count" x="425" y="${288 + index * 100}">${count}</text><text class="branch-name" x="425" y="${309 + index * 100}">${label}</text></g>`).join('')}
     ${!leaves.length ? `<text class="scene-empty" x="780" y="${branchY}">${network.branch === 'outputs' ? 'Run this agent to create shared outputs.' : 'Complete a task to receive a session receipt.'}</text>` : ''}
     ${leafNodes}
