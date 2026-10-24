@@ -1,4 +1,4 @@
-# 🌐 Nexus: Autonomous Multi-Agent Orchestration Hub
+# S.H.I.E.L.D: Autonomous Multi-Agent Orchestration Hub
 
 [![CI](https://github.com/vinay3254/nexus/actions/workflows/ci.yml/badge.svg)](https://github.com/vinay3254/nexus/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -8,18 +8,18 @@ Nexus is an enterprise-grade, resilient runtime and orchestration engine for spe
 
 ---
 
-## ⚡ Core Pillars
+## Core Pillars
 
-* **🏪 An "App Store" for AI Workers:** Nexus lets completely different AI agents plug into a central hub, discover each other's specialized skills via capability manifests, and pass chores back and forth automatically. Supports runtime dynamic plugins from external `.py` files.
-* **📋 Shared Memory Blackboard:** All agents read from and write to a single live digital notebook with async pub/sub event broadcasting and optional SQLite WAL persistence, stopping agents from wasting compute and API budget repeating each other's work.
-* **🛡️ Self-Healing Security Guard:** Untrusted agent code is isolated inside a secure virtual container sandbox (`bwrap`). If code crashes or fails, the hub catches the error trace and forces agents to rewrite it until it works cleanly.
-* **🔏 Cryptographic Trust Layer:** Every final artifact, execution telemetry, and output payload is hashed with SHA-256 and signed with Ed25519 asymmetric keys, producing tamper-evident digital receipts.
-* **🖥️ Realtime Web Dashboard & Daemon:** Built-in FastAPI WebSocket server with a card-based workspace, per-agent workflow graphs, execution inspectors, shared blackboard outputs, and cryptographic receipts. The workspace connects automatically to live server data; an optional preview mode demonstrates workflows without executing tasks.
-* **🤖 Multi-LLM Provider Auto-Discovery:** Seamless auto-detection and execution across Anthropic Claude (`CLAUDE_API_KEY` / `ANTHROPIC_API_KEY`), local Ollama (`localhost:11434`), OpenAI (`OPENAI_API_KEY`), or offline deterministic Mock LLM.
+* **An "App Store" for AI Workers:** Nexus lets completely different AI agents plug into a central hub, discover each other's specialized skills via capability manifests, and pass chores back and forth automatically. Supports runtime dynamic plugins from external `.py` files.
+* **Shared Memory Blackboard:** All agents read from and write to a single live digital notebook with async pub/sub event broadcasting and optional SQLite WAL persistence, stopping agents from wasting compute and API budget repeating each other's work.
+* **Self-Healing Security Guard:** Untrusted agent code is isolated inside a secure virtual container sandbox (`bwrap`). If code crashes or fails, the hub catches the error trace and forces agents to rewrite it until it works cleanly.
+* **Cryptographic Trust Layer:** Every final artifact, execution telemetry, and output payload is hashed with SHA-256 and signed with Ed25519 asymmetric keys, producing tamper-evident digital receipts.
+* **Realtime Web Dashboard & Daemon:** Built-in FastAPI WebSocket server with a card-based workspace, per-agent workflow graphs, execution inspectors, shared blackboard outputs, and cryptographic receipts. The workspace connects automatically to live server data; an optional preview mode demonstrates workflows without executing tasks.
+* **Multi-LLM Provider Auto-Discovery:** Seamless auto-detection and execution across Anthropic Claude (`CLAUDE_API_KEY` / `ANTHROPIC_API_KEY`), local Ollama (`localhost:11434`), OpenAI (`OPENAI_API_KEY`), or offline deterministic Mock LLM.
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 
 ```
                        ┌──────────────────────┐
@@ -62,7 +62,7 @@ Nexus is an enterprise-grade, resilient runtime and orchestration engine for spe
 
 ---
 
-## 🛠️ Tech Stack & Technology Choices
+## Tech Stack & Technology Choices
 
 | Component | Technology | Rationale |
 |-----------|------------|-----------|
@@ -117,7 +117,7 @@ Browser tests start an isolated mock-provider daemon on port 8769 and cover desk
 
 ---
 
-## 🚀 CLI Interface & Quickstart
+## CLI Interface & Quickstart
 
 ### Installation
 
@@ -173,7 +173,7 @@ uv run nexus verify-receipt ./receipt.json
 
 ---
 
-## 📂 Repository Structure
+## Repository Structure
 
 ```
 nexus/
@@ -207,6 +207,6 @@ nexus/
 
 ---
 
-## 🤝 Contributing & License
+## Contributing & License
 
 Distributed under the MIT License. See [LICENSE](LICENSE) for details.

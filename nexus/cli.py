@@ -78,7 +78,7 @@ def list_agents(plugins: str | None):
 def run_demo(scenario: str):
     """Run an interactive demonstration scenario of Nexus capabilities."""
     console = get_console()
-    console.print(f"\n[bold cyan]✨ Running Showcase Scenario: '{scenario}'[/bold cyan]\n")
+    console.print(f"\n[bold cyan]Running Showcase Scenario: '{scenario}'[/bold cyan]\n")
 
     result = asyncio.run(run_demo_scenario(scenario))
 
@@ -89,11 +89,11 @@ def run_demo(scenario: str):
             "[bold yellow]Step 2: Trust Layer caught non-zero sandbox exit & intercepted stderr[/bold yellow]\n\n"
             "[bold green]Step 3: Healed & Verified Output:[/bold green]\n"
             f"[bold white]{result['output']}[/bold white]",
-            title="🛡️ Self-Healing Security Guard Demo",
+            title="Self-Healing Security Guard Demo",
             border_style="green",
         ))
     elif scenario == "orchestration":
-        console.print(f"[bold green]✅ Executed {result['subtasks_executed']} subtasks across workers.[/bold green]")
+        console.print(f"[bold green]Executed {result['subtasks_executed']} subtasks across workers.[/bold green]")
         for item in result["outputs"]:
             console.print(f"  • [[bold cyan]{item['agent_id']}[/bold cyan]] {item['result'][:80]}...")
         console.print("\n[bold yellow]Cryptographic Receipt generated for merged output.[/bold yellow]")
@@ -113,12 +113,12 @@ def verify_receipt(receipt_path: str):
         receipt = SignedReceipt(**data)
         if receipt.verify():
             render_receipt_panel(receipt)
-            click.echo("✅ Receipt signature is VALID")
+            click.echo("Receipt signature is VALID")
         else:
-            click.echo("❌ Receipt signature is INVALID or tampered with.", err=True)
+            click.echo("Receipt signature is INVALID or tampered with.", err=True)
             sys.exit(1)
     except Exception as e:
-        click.echo(f"❌ Failed to parse receipt: {e}", err=True)
+        click.echo(f"Failed to parse receipt: {e}", err=True)
         sys.exit(1)
 
 
@@ -221,7 +221,7 @@ async def _run_task_async(
     dry_run: bool,
 ):
     console = get_console()
-    console.print(f"\n[bold cyan]🚀 Dispatching task:[/bold cyan] \"{task}\"\n")
+    console.print(f"\n[bold cyan]Dispatching task:[/bold cyan] \"{task}\"\n")
 
     planner = TaskPlanner()
     subtasks = planner.decompose(task)
@@ -255,18 +255,18 @@ async def _run_task_async(
 
     for st in subtasks:
         worker_id = supervisor.select_worker(st)
-        console.print(f"⚡ Subtask [[bold yellow]{st.id}[/bold yellow]] routed to: [bold green]{worker_id}[/bold green]")
+        console.print(f"Subtask [[bold yellow]{st.id}[/bold yellow]] routed to: [bold green]{worker_id}[/bold green]")
 
         output = await supervisor.execute_subtask(st, agents, bb)
 
         if output.is_code:
-            console.print("🛡️  [bold purple]Trust Layer:[/bold purple] Testing code in isolated container...")
+            console.print("[bold purple]Trust Layer:[/bold purple] Testing code in isolated container...")
             try:
                 verified_out = await healer.execute_with_healing(output.result, max_retries=sandbox_retries)
-                console.print("✅ [bold green]Sandbox execution successful.[/bold green]")
+                console.print("[bold green]Sandbox execution successful.[/bold green]")
                 results.append(f"[{st.id}] Verified Code Output:\n{verified_out}")
             except Exception as e:
-                console.print(f"⚠️  [yellow]Sandbox warning:[/yellow] {e}")
+                console.print(f"[yellow]Sandbox warning:[/yellow] {e}")
                 results.append(f"[{st.id}] Raw Code:\n{output.result}")
         else:
             results.append(f"[{st.id}] Output:\n{output.result}")
@@ -287,9 +287,9 @@ async def _run_task_async(
     if export_receipt:
         with open(export_receipt, "w", encoding="utf-8") as f:
             f.write(receipt.model_dump_json(indent=2))
-        console.print(f"\n📝 Signed receipt exported to [bold cyan]{export_receipt}[/bold cyan]")
+        console.print(f"\nSigned receipt exported to [bold cyan]{export_receipt}[/bold cyan]")
 
-    console.print("\n[bold green]✨ Task completed successfully.[/bold green]\n")
+    console.print("\n[bold green]Task completed successfully.[/bold green]\n")
 
 
 if __name__ == "__main__":

@@ -144,7 +144,7 @@ def create_app(
         ]
 
     async def _execute_task_pipeline(task_text: str):
-        await manager.broadcast({"type": "log", "message": f"🚀 Decomposing task: '{task_text}'"})
+        await manager.broadcast({"type": "log", "message": f"Decomposing task: '{task_text}'"})
         planner = TaskPlanner()
         subtasks = planner.decompose(task_text)
         supervisor = RouterSupervisor(store)
@@ -157,7 +157,7 @@ def create_app(
             worker_id = supervisor.select_worker(st)
             await manager.broadcast({
                 "type": "log",
-                "message": f"⚡ Routed subtask [{st.id}] to {worker_id}",
+                "message": f"Routed subtask [{st.id}] to {worker_id}",
             })
 
             output = await supervisor.execute_subtask(st, agent_dict, bb)
@@ -180,7 +180,7 @@ def create_app(
                         })
                     await manager.broadcast({
                         "type": "log",
-                        "message": f"✅ Sandbox execution and self-healing passed for [{st.id}]",
+                        "message": f"Sandbox execution and self-healing passed for [{st.id}]",
                     })
                     results.append(verified_code)
                 except Exception as e:
@@ -193,7 +193,7 @@ def create_app(
                     })
                     await manager.broadcast({
                         "type": "log",
-                        "message": f"⚠️ Sandbox error on [{st.id}]: {e}",
+                        "message": f"Sandbox error on [{st.id}]: {e}",
                     })
                     results.append(output.result)
             else:
@@ -210,7 +210,7 @@ def create_app(
             "payload_digest": receipt.payload_digest,
             "timestamp": receipt.timestamp,
         })
-        await manager.broadcast({"type": "log", "message": "✨ Task completed successfully."})
+        await manager.broadcast({"type": "log", "message": "Task completed successfully."})
 
     @app.post("/api/run")
     async def run_task(req: RunTaskRequest):

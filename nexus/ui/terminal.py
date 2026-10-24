@@ -16,7 +16,7 @@ def get_console(console: Console | None = None) -> Console:
 def render_agent_table(agents: Sequence[AgentManifest], console: Console | None = None) -> None:
     c = get_console(console)
     table = Table(
-        title="🏪 Nexus Worker App Store",
+        title="Nexus Worker App Store",
         title_style="bold cyan",
         header_style="bold magenta",
         border_style="dim",
@@ -42,7 +42,7 @@ def render_agent_table(agents: Sequence[AgentManifest], console: Console | None 
 
 def render_plan_tree(subtasks: Sequence[Subtask], console: Console | None = None) -> None:
     c = get_console(console)
-    tree = Tree("🧭 [bold cyan]Execution Plan DAG[/bold cyan]")
+    tree = Tree("[bold cyan]Execution Plan DAG[/bold cyan]")
 
     for idx, st in enumerate(subtasks, 1):
         tags_str = " ".join(f"[dim]#{t}[/dim]" for t in st.tags)
@@ -70,11 +70,11 @@ def render_receipt_panel(receipt: SignedReceipt, console: Console | None = None)
     content.append("Timestamp:      ", style="bold yellow")
     content.append(f"{receipt.timestamp}\n", style="white")
 
-    content.append("\n✅ Cryptographically Verified (Ed25519)", style="bold green")
+    content.append("\n[Verified] Cryptographically Verified (Ed25519)", style="bold green")
 
     panel = Panel(
         content,
-        title="🔏 Cryptographic Execution Receipt",
+        title="Cryptographic Execution Receipt",
         border_style="green",
         expand=False,
     )
